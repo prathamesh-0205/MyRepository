@@ -1,0 +1,38 @@
+
+                                              Database Triggers
+	*In a database management system (DBMS), 
+	a trigger is a special type of stored procedure that is automatically executed or fired in response to certain events or actions occurring in the database.
+	These events can include data manipulation operations (such as INSERT, UPDATE, DELETE), or database schema changes.										  
+											  
+create table emp:
+create table emp employees (
+    empno int AUTO_INCREMENT PRIMARY KEY,
+    ename VARCHAR(100),
+	job varchar(20),
+    sal float(9,2),
+);
+
+----------------create table emp_audit--------------------
+
+whenever a new row is inserted or an existing row is updated or deleted in the employees table, the last_updated or last_deleted column will automatically be updated with the current timestamp in emp_audit table.
+
+create table emp_audit(
+empno int,
+ename varchar(20),
+oldsal float(9,2),
+newsal float(9,2),
+username varchar(20),
+changedate date ,
+action varchar(20));
+
+create trigger updateemp before update on emp
+for each row
+insert into emp_audit values(old.empno,old.ename,old.sal,new.sal,user(),curdate(),'update');
+
+create trigger deleteemp before delete on emp
+for each row
+insert into emp_audit values(old.empno,old.ename,old.sal,null,user(),curdate(),'delete');
+
+create trigger insertemp before insert on emp
+for each row
+insert into emp_audit values(old.empno,old.ename,old.sal,null,user(),curdate(),'insert');
